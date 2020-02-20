@@ -1,0 +1,3 @@
+---
+- name: "[Service] Ensure docker is enabled at boot time"
+  service: name=docker enabled=yes state=started

@@ -1,0 +1,16 @@
+---
+# tasks file for ansible-docker-multi
+
+- include_tasks: docker-ce.yml
+  when: docker_type == 'docker-ce'
+  tags: [docker, docker-install]
+
+- include_tasks: docker.yml
+  when: docker_type != 'docker-ce'
+  tags: [docker, docker-install]
+
+- include_tasks: configure.yml
+  tags: [docker, docker-configure]
+
+- include_tasks: service.yml
+  tags: [docker, docker-service]

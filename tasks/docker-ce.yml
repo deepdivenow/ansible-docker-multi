@@ -1,0 +1,44 @@
+---
+- name: "[EL] Install required packages"
+  yum: name="{{ docker_ce_require }}"
+
+- name: Add multiple repositories into the same file (1/2)
+  yum_repository:
+    name: docker-ce-stable
+    description: Docker CE Stable - $basearch
+#     file: external_repos
+    baseurl: https://download.docker.com/linux/centos/7/$basearch/stable
+    gpgcheck: yes
+    gpgkey: https://download.docker.com/linux/centos/gpg
+
+- name: "[Common] Install pip"
+  easy_install:
+    name=pip
+    state=present
+
+- name: "[Common] Set docker-py package to be installed"
+  set_fact:
+    docker_py_package: "docker-py"
+
+# https://github.com/ansible/ansible/issues/42162
+# https://github.com/dcos-labs/ansible-dcos/pull/20
+- name: "[Common] Set docker-py package to be installed"
+  set_fact:
+    docker_py_package: "docker"
+  when: ansible_version.minor >= 6
+
+# Required by the Ansible Docker module
+- name: "[Common] Install docker-py dependency"
+  pip:
+    name="{{docker_py_package}}"
+    state=latest
+
+- name: "[Common] Remove default Docker packages"
+  package:
+    name: [docker, docker-common, docker-client]
+    state: absent
+
+- name: "[Common] Install Docker CE package"
+  package:
+    name=docker-ce
+    state=present
